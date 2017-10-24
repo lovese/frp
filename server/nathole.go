@@ -9,6 +9,7 @@ import (
 
 	"github.com/fatedier/frp/models/msg"
 	"github.com/fatedier/frp/utils/errors"
+	"github.com/fatedier/frp/utils/log"
 	"github.com/fatedier/frp/utils/pool"
 	"github.com/fatedier/frp/utils/util"
 )
@@ -65,12 +66,14 @@ func (nc *NatHoleController) Run() {
 		buf := pool.GetBuf(1024)
 		n, raddr, err := nc.listener.ReadFromUDP(buf)
 		if err != nil {
+			log.Trace("nat hole listener read from udp error: %v", err)
 			return
 		}
 
 		rd := bytes.NewReader(buf[:n])
 		rawMsg, err := msg.ReadMsg(rd)
 		if err != nil {
+			log.Trace("read nat hole message error: %v", err)
 			continue
 		}
 
@@ -105,6 +108,7 @@ func (nc *NatHoleController) HandleVistor(m *msg.NatHoleVistor, raddr *net.UDPAd
 	}
 	nc.sessions[sid] = session
 	nc.mu.Unlock()
+	log.Trace("handle vistor message, sid [%s]", sid)
 
 	defer func() {
 		nc.mu.Lock()
@@ -123,6 +127,7 @@ func (nc *NatHoleController) HandleVistor(m *msg.NatHoleVistor, raddr *net.UDPAd
 	select {
 	case <-session.NotifyCh:
 		resp := nc.GenNatHoleResponse(raddr, session)
+		log.Trace("send nat hole response to vistor")
 		nc.listener.WriteToUDP(resp, raddr)
 	case <-time.After(time.Duration(NatHoleTimeout) * time.Second):
 		return
@@ -136,10 +141,12 @@ func (nc *NatHoleController) HandleClient(m *msg.NatHoleClient, raddr *net.UDPAd
 	if !ok {
 		return
 	}
+	log.Trace("handle client message, sid [%s]", session.Sid)
 	session.ClientAddr = raddr
 	session.NotifyCh <- struct{}{}
 
 	resp := nc.GenNatHoleResponse(raddr, session)
+	log.Trace("send nat hole response to client")
 	nc.listener.WriteToUDP(resp, raddr)
 }
 

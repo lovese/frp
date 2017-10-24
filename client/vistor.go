@@ -51,6 +51,11 @@ func NewVistor(ctl *Control, pxyConf config.ProxyConf) (vistor Vistor) {
 			BaseVistor: baseVistor,
 			cfg:        cfg,
 		}
+	case *config.XtcpProxyConf:
+		vistor = &XtcpVistor{
+			BaseVistor: baseVistor,
+			cfg:        cfg,
+		}
 	}
 	return
 }
