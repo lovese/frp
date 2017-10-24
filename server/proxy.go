@@ -319,6 +319,10 @@ type XtcpProxy struct {
 }
 
 func (pxy *XtcpProxy) Run() error {
+	if pxy.ctl.svr.natHoleController == nil {
+		pxy.Error("udp port for xtcp is not specified.")
+		return fmt.Errorf("udp port for xtcp is not specified")
+	}
 	sidCh := pxy.ctl.svr.natHoleController.ListenClient(pxy.GetName(), pxy.cfg.Sk)
 	go func() {
 		for {
