@@ -73,7 +73,10 @@ func NewProxy(ctl *Control, pxyConf config.ProxyConf) (pxy Proxy) {
 			cfg:       cfg,
 		}
 	case *config.XtcpProxyConf:
-		pxy = &XtcpProxy{}
+		pxy = &XtcpProxy{
+			BaseProxy: baseProxy,
+			cfg:       cfg,
+		}
 	}
 	return
 }
