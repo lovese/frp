@@ -260,6 +260,7 @@ func (pxy *XtcpProxy) InWorkConn(conn frpNet.Conn) {
 	clientConn.Close()
 
 	// Send sid to vistor udp address.
+	time.Sleep(time.Second)
 	laddr, _ := net.ResolveUDPAddr("udp", clientConn.LocalAddr().String())
 	daddr, err := net.ResolveUDPAddr("udp", natHoleRespMsg.VistorAddr)
 	if err != nil {

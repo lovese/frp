@@ -79,9 +79,12 @@ func (nc *NatHoleController) Run() {
 
 		switch m := rawMsg.(type) {
 		case *msg.NatHoleVistor:
-			nc.HandleVistor(m, raddr)
+			go nc.HandleVistor(m, raddr)
 		case *msg.NatHoleClient:
-			nc.HandleClient(m, raddr)
+			go nc.HandleClient(m, raddr)
+		default:
+			log.Trace("error nat hole message type")
+			continue
 		}
 		pool.PutBuf(buf)
 	}
