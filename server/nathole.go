@@ -35,7 +35,9 @@ func NewNatHoleController(udpBindAddr string) (nc *NatHoleController, err error)
 		return nil, err
 	}
 	nc = &NatHoleController{
-		listener: lconn,
+		listener:   lconn,
+		clientCfgs: make(map[string]*NatHoleClientCfg),
+		sessions:   make(map[string]*NatHoleSession),
 	}
 	return nc, nil
 }
